@@ -31,10 +31,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 		)
 )
 
-public class BankingAppApplication {
+public class BankingApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(BankingAppApplication.class, args);
+		SpringApplication.run(BankingApplication.class, args);
 	}
 
 }

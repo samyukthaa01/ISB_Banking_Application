@@ -27,6 +27,7 @@ public class UserDto {
     @NotBlank(message = "The email cannot be blank")
     @Email(message = "Invalid email address. Please enter a proper email ID.")
     private String email;
+    private String password;
     @NotNull(message = "Phone number cannot be null.")
     @Size(min = 9, max = 9, message = "Phone number must be exactly 10 digits long.")
     @Pattern(regexp = "\\d+", message = "Phone number must contain only digits and no hyphens.")

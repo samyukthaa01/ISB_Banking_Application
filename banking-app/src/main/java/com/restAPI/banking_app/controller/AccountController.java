@@ -98,6 +98,11 @@ public class AccountController {
         return accountService.transfer(request);
     }
 
+    @PostMapping("/login")
+    public BankResponseDto login(@RequestBody LoginDto loginDto){
+        return accountService.login(loginDto);
+    }
+
     //Get all accounts REST API
     @GetMapping
     public ResponseEntity<List<AccountDto>> getAllAccounts() {

@@ -1,8 +1,10 @@
 package com.restAPI.banking_app.service.impl;
 
 import com.restAPI.banking_app.ExceptionHandling.ApiException;
+import com.restAPI.banking_app.config.JwtTokenProvider;
 import com.restAPI.banking_app.dto.*;
 import com.restAPI.banking_app.entity.Account;
+import com.restAPI.banking_app.entity.Role;
 import com.restAPI.banking_app.entity.User;
 import com.restAPI.banking_app.mapper.AccountMapper;
 import com.restAPI.banking_app.repository.AccountRepo;
@@ -12,7 +14,12 @@ import com.restAPI.banking_app.service.EmailService;
 import com.restAPI.banking_app.service.TransactionService;
 import com.restAPI.banking_app.utils.AccountUtils;
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -20,6 +27,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class AccountServiceImpl implements AccountService {
     @Autowired
     private UserRepo userRepository;
@@ -29,6 +37,15 @@ public class AccountServiceImpl implements AccountService {
 
     @Autowired
     private TransactionService transactionService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    AuthenticationManager authenticationManager;
+
+    @Autowired
+    JwtTokenProvider jwtTokenProvider;
 
     @Autowired
     private AccountRepo accountRepository;
@@ -49,8 +66,10 @@ public class AccountServiceImpl implements AccountService {
                 .lastName(userDto.getLastName())
                 .address(userDto.getAddress())
                 .email(userDto.getEmail())
+                .password(passwordEncoder.encode(userDto.getPassword()))
                 .phoneNumber(userDto.getPhoneNumber())
                 .status("ACTIVE")
+                .role(Role.valueOf("ROLE_ADMIN"))
                 .build();
         User savedUser = userRepository.save(newUser);
 
@@ -89,6 +108,23 @@ public class AccountServiceImpl implements AccountService {
 
     }
 
+    public BankResponseDto login(LoginDto loginDto) {
+        Authentication authentication = null;
+        authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword())
+        );
+
+        EmailDto loginAlert = EmailDto.builder()
+                .subject("You're logged in!")
+                .recipient(loginDto.getEmail())
+                .messageBody("You logged into your account. If you did not perform this action, please contact your bank for further assistance")
+                .build();
+        emailService.sendEmailAlert(loginAlert);
+        return BankResponseDto.builder()
+                .responseMessage("Login Successful")
+                .token(jwtTokenProvider.generateToken(authentication))
+                .build();
+    }
 
     @Override
     public BankResponseDto balanceEnquiry(EnquiryRequestDto request) {

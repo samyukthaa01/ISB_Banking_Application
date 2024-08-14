@@ -6,10 +6,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface AccountRepo extends JpaRepository<Account, Long> {
 
     Boolean existsByAccountNumber(String accountNumber);
+
     Account findByAccountNumber(String accountNumber);
     @Query(value = "SELECT a FROM Account a WHERE a.accountHolderName = ?1")
     Account findByAccountHolderName(String accountHolderName);

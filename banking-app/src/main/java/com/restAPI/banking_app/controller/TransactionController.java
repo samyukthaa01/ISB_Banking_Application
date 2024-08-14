@@ -19,6 +19,20 @@ import java.util.List;
 public class TransactionController {
 
     private BankStatementImpl bankStatement;
+    /**
+     * Generates a bank statement for the specified account number within the given date range.
+     *
+     * <p>This method accepts the account number, start date, and end date as query parameters
+     * and returns a list of transactions that fall within that period. The generated statement
+     * is retrieved using the BankStatementImpl service.
+     *
+     * @param accountNumber the account number for which the bank statement is to be generated.
+     * @param startDate the start date of the period for which transactions are to be included in the statement.
+     * @param endDate the end date of the period for which transactions are to be included in the statement.
+     * @return a list of transactions within the specified date range for the given account number.
+     * @throws DocumentException if there is an error in generating the document (e.g., PDF).
+     * @throws FileNotFoundException if the file required for generating the statement is not found.
+     */
 
    @GetMapping
     public List<Transaction> generateBankStatement(@RequestParam String accountNumber,

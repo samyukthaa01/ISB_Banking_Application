@@ -20,5 +20,10 @@ public class BankResponseDto {
             name = "Response Message for The Response Code"
     )
     private String responseMessage;
+
+    @Schema(
+            name = "Token for the Authentication"
+    )
+    private String token;
     private AccountDto accountDto;
 }
