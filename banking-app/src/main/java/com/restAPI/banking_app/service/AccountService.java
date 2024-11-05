@@ -1,6 +1,7 @@
 package com.restAPI.banking_app.service;
 
 import com.restAPI.banking_app.dto.*;
+import com.restAPI.banking_app.entity.Transaction;
 
 import java.util.List;
 
@@ -15,4 +16,5 @@ public interface AccountService {
     List<AccountDto> getAllAccounts();
     void deleteAccount(String accountNumber);
 
+    BankResponseDto getTransactionsByAccountNumber(TransactionDto request);
 }

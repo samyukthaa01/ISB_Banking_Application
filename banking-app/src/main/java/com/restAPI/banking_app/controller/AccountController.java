@@ -1,6 +1,7 @@
 package com.restAPI.banking_app.controller;
 
 import com.restAPI.banking_app.dto.*;
+import com.restAPI.banking_app.entity.Transaction;
 import com.restAPI.banking_app.service.AccountService;
 import com.restAPI.banking_app.utils.AccountUtils;
 import io.swagger.v3.oas.annotations.Operation;
@@ -115,6 +116,19 @@ public class AccountController {
     public ResponseEntity<String> deleteAccount(@PathVariable String accountNumber) {
         accountService.deleteAccount(accountNumber);
         return ResponseEntity.ok("Account deleted successfully!");
+    }
+
+    @GetMapping("transactions")
+    /*public List<TransactionDto> getTransactions(@PathVariable String accountNumber) {
+        return accountService.getTransactionsByAccountNumber(accountNumber);
+    }*/
+
+    /*public BankResponseDto getTransactions(@RequestBody TransferRequestDto request) {
+        return accountService.getTransactionsByAccountNumber();
+    }*/
+
+    public BankResponseDto getTransactions(@RequestBody TransactionDto request) {
+        return accountService.getTransactionsByAccountNumber(request);
     }
 }
 

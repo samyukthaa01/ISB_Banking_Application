@@ -17,4 +17,6 @@ public class DepositDto {
     private String accountNumber;
     @NotNull(message = "The amount cannot be null")
     private double amount;
+    private String customerName;
+    private String address;
 }

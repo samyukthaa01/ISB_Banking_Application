@@ -17,8 +17,8 @@ public class GlobalExceptionHandler {
     ResponseEntity<?> handeResourceNotFound(ApiException ex) {
         Map<String, String> errorMap = new HashMap<>();
         errorMap.put("message", ex.getMessage());
-        errorMap.put("status", "400");
-        return new ResponseEntity<>(errorMap, HttpStatus.BAD_REQUEST);
+        errorMap.put("status", "404");
+        return new ResponseEntity<>(errorMap, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

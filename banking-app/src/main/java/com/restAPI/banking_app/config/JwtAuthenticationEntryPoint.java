@@ -1,3 +1,4 @@
+/*
 package com.restAPI.banking_app.config;
 
 import jakarta.servlet.ServletException;
@@ -15,3 +16,4 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage());
     }
 }
+*/

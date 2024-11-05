@@ -1,3 +1,4 @@
+/*
 package com.restAPI.banking_app.config;
 
 import io.jsonwebtoken.*;
@@ -32,7 +33,7 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(currentDate)
-//                .setExpiration(expiryDate)
+                .setExpiration(expiryDate)
                 .setExpiration(expiryDate)
                 .signWith(secretKey)
                 .compact();
@@ -64,3 +65,4 @@ public class JwtTokenProvider {
 
 
 }
+*/

@@ -22,7 +22,9 @@ public class Account {
     private String accountHolderName;
     private BigDecimal balance;
     private String accountNumber;
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "account", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Transaction> transactions;
+    @OneToMany( mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     //@JsonIgnore
     private List<Cards> cards;
     @ManyToOne

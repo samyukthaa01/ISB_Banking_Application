@@ -26,4 +26,7 @@ public class Transaction {
     private LocalDate createdAt;
     @UpdateTimestamp
     private LocalDate modifiedAt;
+    @ManyToOne
+    @JoinColumn(name = "account_id", nullable = false)  // 'account_id' should match the name used in the `Account` entity
+    private Account account;
 }

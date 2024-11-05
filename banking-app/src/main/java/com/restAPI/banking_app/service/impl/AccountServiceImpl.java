@@ -1,12 +1,10 @@
 package com.restAPI.banking_app.service.impl;
 
 import com.restAPI.banking_app.ExceptionHandling.ApiException;
-import com.restAPI.banking_app.config.JwtTokenProvider;
 import com.restAPI.banking_app.dto.*;
 import com.restAPI.banking_app.entity.Account;
 import com.restAPI.banking_app.entity.Role;
 import com.restAPI.banking_app.entity.User;
-import com.restAPI.banking_app.mapper.AccountMapper;
 import com.restAPI.banking_app.repository.AccountRepo;
 import com.restAPI.banking_app.repository.UserRepo;
 import com.restAPI.banking_app.service.AccountService;
@@ -19,7 +17,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.JwtClaimsSet;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -44,8 +46,10 @@ public class AccountServiceImpl implements AccountService {
     @Autowired
     AuthenticationManager authenticationManager;
 
+    /*@Autowired
+    JwtTokenProvider jwtTokenProvider;*/
     @Autowired
-    JwtTokenProvider jwtTokenProvider;
+    private JwtEncoder jwtEncoder;
 
     @Autowired
     private AccountRepo accountRepository;
@@ -75,6 +79,7 @@ public class AccountServiceImpl implements AccountService {
 
         // Generate a unique account number
         String accountNumber = AccountUtils.generateAccountNumber();
+
 
         // Create and save the Account entity
         Account newAccount = Account.builder()
@@ -109,21 +114,38 @@ public class AccountServiceImpl implements AccountService {
     }
 
     public BankResponseDto login(LoginDto loginDto) {
-        Authentication authentication = null;
-        authentication = authenticationManager.authenticate(
+        // Authenticate the user
+        Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword())
         );
 
+        // Optionally set the authentication in the SecurityContext
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        // Generate JWT Token
+        String token = generateJwtToken(authentication);
+
+        // Send login alert email
         EmailDto loginAlert = EmailDto.builder()
                 .subject("You're logged in!")
                 .recipient(loginDto.getEmail())
                 .messageBody("You logged into your account. If you did not perform this action, please contact your bank for further assistance")
                 .build();
         emailService.sendEmailAlert(loginAlert);
+
         return BankResponseDto.builder()
                 .responseMessage("Login Successful")
-                .token(jwtTokenProvider.generateToken(authentication))
+                .token(token)
                 .build();
+    }
+
+    private String generateJwtToken(Authentication authentication) {
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .subject(authentication.getName())
+                .claim("roles", authentication.getAuthorities())
+                .build();
+
+        return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
     }
 
     @Override
@@ -307,6 +329,27 @@ public class AccountServiceImpl implements AccountService {
         if (account != null) {
             accountRepository.delete(account);
         }
+    }
+    /*public List<TransactionDto> getTransactionsByAccountNumber(String accountNumber) {
+        return accountRepository.findTransactionsByAccountNumber(accountNumber);
+    }*/
+    @Override
+    public BankResponseDto getTransactionsByAccountNumber(TransactionDto request) {
+        //check if provided account number exists in the db
+        if (!accountRepository.existsByAccountNumber(request.getAccountNumber())) {
+            throw new ApiException(AccountUtils.ACCOUNT_NOT_EXIST, AccountUtils.ACCOUNT_NOT_EXIST_MESSAGE);
+        }
+        TransactionDto transactionDto = TransactionDto.builder()
+                .transactionType("CREDIT")
+                .amount(request.getAmount())
+                .build();
+
+        return BankResponseDto.builder()
+                .responseCode(AccountUtils.TRANSFER_SUCCESSFUL_CODE)
+                .responseMessage(AccountUtils.TRANSFER_SUCCESSFUL_MESSAGE)
+                .accountDto(null)
+                .build();
+
     }
 
 
